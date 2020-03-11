@@ -1,0 +1,10 @@
+apiVersion: v2
+name: web-api-template
+description: Test dotnet project for setting up CI/CD with Kubernetes
+
+type: application
+
+# chart version
+version: 0.1.0
+# app version
+appVersion: 0.1.0

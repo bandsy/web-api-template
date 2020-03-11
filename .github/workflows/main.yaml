@@ -1,0 +1,71 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  # test:
+  #   name: Run tests
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: node
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Install dependencies
+  #       uses: borales/actions-yarn@v2.0.0
+  #       with:
+  #         cmd: install
+  #     - name: Lint
+  #       uses: borales/actions-yarn@v2.0.0
+  #       with:
+  #         cmd: lint
+  #     - name: Test
+  #       uses: borales/actions-yarn@v2.0.0
+  #       with:
+  #         cmd: test
+  #     - name: Build
+  #       uses: borales/actions-yarn@v2.0.0
+  #       with:
+  #         cmd: build
+  build:
+    name: Build docker container
+    if: github.ref == 'refs/heads/develop'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Login to dockerhub
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build docker image
+        run: docker build -t ${{ github.event.repository.name }} .
+      - name: Docker tag
+        run: |
+          docker tag ${{ github.event.repository.name }} bandsy/${{ github.event.repository.name }}:${{ github.sha }}
+          docker tag ${{ github.event.repository.name }} bandsy/${{ github.event.repository.name }}:latest
+      - name: Push docker image
+        run: |
+          docker push bandsy/${{ github.event.repository.name }}:${{ github.sha }}
+          docker push bandsy/${{ github.event.repository.name }}:latest
+  deploy:
+    name: Deploy to kubernetes
+    if: github.ref == 'refs/heads/develop'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Save kubeconfig
+        uses: digitalocean/action-doctl@master
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        with:
+          args: kubernetes cluster kubeconfig show k8s-bandsy > $GITHUB_WORKSPACE/.kubeconfig
+      - name: Install helm
+        run: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh
+      - name: Update deployment
+        run: helm upgrade web-api-template ./chart --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig --namespace develop --set-string sha=${{ github.sha }}
