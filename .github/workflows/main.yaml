@@ -17,24 +17,13 @@ jobs:
       image: node
     steps:
       - uses: actions/checkout@v1
-      - name: "Dummy test"
-        run: echo idk how testing works in dotnet lel
-      # - name: Install dependencies
-      #   uses: borales/actions-yarn@v2.0.0
-      #   with:
-      #     cmd: install
-      # - name: Lint
-      #   uses: borales/actions-yarn@v2.0.0
-      #   with:
-      #     cmd: lint
-      # - name: Test
-      #   uses: borales/actions-yarn@v2.0.0
-      #   with:
-      #     cmd: test
-      # - name: Build
-      #   uses: borales/actions-yarn@v2.0.0
-      #   with:
-      #     cmd: build
+      # use lts dotnet core version
+      - name: Setup dotnet-core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.1.16
+      - name: Test
+        run: cd ./web-api-template.unit-tests && dotnet test
   build:
     name: Build docker container
     if: github.ref == 'refs/heads/develop'
