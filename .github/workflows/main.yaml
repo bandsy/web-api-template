@@ -17,11 +17,10 @@ jobs:
       image: node
     steps:
       - uses: actions/checkout@v1
-      # use lts dotnet core version
       - name: Setup dotnet-core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.1.16
+          dotnet-version: 2.2.108
       - name: Test
         run: cd ./web-api-template.unit-tests && dotnet test
   build:
