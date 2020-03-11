@@ -10,29 +10,31 @@ on:
       - develop
 
 jobs:
-  # test:
-  #   name: Run tests
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: node
-  #   steps:
-  #     - uses: actions/checkout@v1
-  #     - name: Install dependencies
-  #       uses: borales/actions-yarn@v2.0.0
-  #       with:
-  #         cmd: install
-  #     - name: Lint
-  #       uses: borales/actions-yarn@v2.0.0
-  #       with:
-  #         cmd: lint
-  #     - name: Test
-  #       uses: borales/actions-yarn@v2.0.0
-  #       with:
-  #         cmd: test
-  #     - name: Build
-  #       uses: borales/actions-yarn@v2.0.0
-  #       with:
-  #         cmd: build
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    container:
+      image: node
+    steps:
+      - uses: actions/checkout@v1
+      - name: "Dummy test"
+        run: echo idk how testing works in dotnet lel
+      # - name: Install dependencies
+      #   uses: borales/actions-yarn@v2.0.0
+      #   with:
+      #     cmd: install
+      # - name: Lint
+      #   uses: borales/actions-yarn@v2.0.0
+      #   with:
+      #     cmd: lint
+      # - name: Test
+      #   uses: borales/actions-yarn@v2.0.0
+      #   with:
+      #     cmd: test
+      # - name: Build
+      #   uses: borales/actions-yarn@v2.0.0
+      #   with:
+      #     cmd: build
   build:
     name: Build docker container
     if: github.ref == 'refs/heads/develop'
