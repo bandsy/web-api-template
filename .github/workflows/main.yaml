@@ -30,18 +30,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Login to dockerhub
-        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to github docker
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }} docker.pkg.github.com
       - name: Build docker image
         run: docker build -t ${{ github.event.repository.name }} .
       - name: Docker tag
         run: |
-          docker tag ${{ github.event.repository.name }} bandsy/${{ github.event.repository.name }}:${{ github.sha }}
-          docker tag ${{ github.event.repository.name }} bandsy/${{ github.event.repository.name }}:latest
+          docker tag ${{ github.event.repository.name }} docker.pkg.github.com/bandsy/${{ github.event.repository.name }}/${{ github.event.repository.name }}-develop:${{ github.sha }}
+          docker tag ${{ github.event.repository.name }} docker.pkg.github.com/bandsy/${{ github.event.repository.name }}/${{ github.event.repository.name }}-develop:latest
       - name: Push docker image
         run: |
-          docker push bandsy/${{ github.event.repository.name }}:${{ github.sha }}
-          docker push bandsy/${{ github.event.repository.name }}:latest
+          docker push docker.pkg.github.com/bandsy/${{ github.event.repository.name }}/${{ github.event.repository.name }}-develop:${{ github.sha }}
+          docker push docker.pkg.github.com/bandsy/${{ github.event.repository.name }}/${{ github.event.repository.name }}-develop:latest
   deploy:
     name: Deploy to kubernetes
     if: github.ref == 'refs/heads/develop'
